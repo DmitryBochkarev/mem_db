@@ -1,5 +1,15 @@
 # frozen_string_literal: true
 
+require "simplecov"
+
+SimpleCov.start do
+  enable_coverage :branch
+
+  add_filter "spec/"
+
+  add_group "Lib", "lib"
+end
+
 require "mem_db"
 
 RSpec.configure do |config|
