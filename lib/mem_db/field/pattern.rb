@@ -65,7 +65,7 @@ class MemDB
               Prefix.new(source[0..-2])
             elsif source.start_with?(WILDCARD)
               Suffix.new(source[1..-1])
-            else
+            else # rubocop:disable Lint/DuplicateBranch
               Rx.new(source)
             end
         end
@@ -78,30 +78,24 @@ class MemDB
       class MultiMatching
         include MemDB::Field::Matching
 
-        def initialize(f, arr)
-          @f = f
+        def initialize(arr)
           @patterns = arr.map { |source| Pattern.new(source) }
         end
 
-        def match?(query)
-          @f.query_value(query).each do |str|
-            return true if @patterns.any? { |pat| pat.match?(str) }
-          end
-
-          false
+        def match?(values)
+          values.any? { |str| @patterns.any? { |pat| pat.match?(str) } }
         end
       end
 
       class SingleMatching
         include MemDB::Field::Matching
 
-        def initialize(f, el)
-          @f = f
+        def initialize(el)
           @pat = Pattern.new(el)
         end
 
-        def match?(query)
-          @f.query_value(query).any? { |str| @pat.match?(str) }
+        def match?(values)
+          values.any? { |str| @pat.match?(str) }
         end
       end
 
@@ -111,13 +105,11 @@ class MemDB
         @field = field
       end
 
-      def new_matching(obj)
-        val = obj[field]
-
-        if val.is_a?(Array)
-          MultiMatching.new(self, val)
+      def new_matching(value)
+        if value.is_a?(Array)
+          MultiMatching.new(value)
         else
-          SingleMatching.new(self, val)
+          SingleMatching.new(value)
         end
       end
     end

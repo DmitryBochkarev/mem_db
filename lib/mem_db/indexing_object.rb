@@ -46,9 +46,7 @@ class MemDB
     def prepare_attr(attr)
       v = @params[attr]
 
-      if v == MemDB::Idx::ANY
-        v
-      elsif v.nil? || v.is_a?(Array)
+      if v == MemDB::Idx::ANY || v.nil? || v.is_a?(Array)
         v
       else
         [v]

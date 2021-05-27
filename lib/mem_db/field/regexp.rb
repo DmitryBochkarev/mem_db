@@ -9,8 +9,11 @@ class MemDB
       include MemDB::Field
 
       class Rx
-        def initialize(source)
-          @rx = ::Regexp.new(source, ::Regexp::MULTILINE)
+        def initialize(source, ignore_case:)
+          opts = ::Regexp::MULTILINE
+          opts |= ::Regexp::IGNORECASE if ignore_case
+
+          @rx = ::Regexp.new(source, opts)
         end
 
         def match?(str)
@@ -21,46 +24,39 @@ class MemDB
       class MultiMatching
         include MemDB::Field::Matching
 
-        def initialize(field, arr)
-          @field = field
-          @patterns = arr.map { |source| Rx.new(source) }
+        def initialize(arr, ignore_case:)
+          @patterns = arr.map { |source| Rx.new(source, ignore_case: ignore_case) }
         end
 
-        def match?(query)
-          @field.query_value(query).each do |str|
-            return true if @patterns.any? { |pat| pat.match?(str) }
-          end
-
-          false
+        def match?(values)
+          values.any? { |str| @patterns.any? { |pat| pat.match?(str) } }
         end
       end
 
       class SingleMatching
         include MemDB::Field::Matching
 
-        def initialize(field, el)
-          @field = field
-          @pat = Rx.new(el)
+        def initialize(el, ignore_case:)
+          @pat = Rx.new(el, ignore_case: ignore_case)
         end
 
-        def match?(query)
-          @field.query_value(query).any? { |str| @pat.match?(str) }
+        def match?(values)
+          values.any? { |str| @pat.match?(str) }
         end
       end
 
       attr_reader :field
 
-      def initialize(field)
+      def initialize(field, ignore_case: false)
         @field = field
+        @ignore_case = ignore_case
       end
 
-      def new_matching(obj)
-        val = obj[field]
-
-        if val.is_a?(Array)
-          MultiMatching.new(self, val)
+      def new_matching(value)
+        if value.is_a?(Array)
+          MultiMatching.new(value, ignore_case: @ignore_case)
         else
-          SingleMatching.new(self, val)
+          SingleMatching.new(value, ignore_case: @ignore_case)
         end
       end
     end

@@ -11,7 +11,7 @@ class MemDB
       class Any
         include MemDB::Field::Matching
 
-        def match?(_query)
+        def match?(_values)
           true
         end
       end
@@ -30,13 +30,11 @@ class MemDB
         @original.query_field
       end
 
-      def new_matching(obj)
-        v = obj[field]
-
-        if v.nil?
+      def new_matching(value)
+        if value.nil?
           ANY_MATCHING
         else
-          @original.new_matching(obj)
+          @original.new_matching(value)
         end
       end
     end
