@@ -12,6 +12,7 @@ RSpec.describe MemDB::Index::SequenceMatch do
     query: {path: "abc"},
     expect: [:abc]
   }
+
   it_behaves_like "index", "no match", {
     indexing: [
       [{path: "0abc0"}, :zero_abc_zero]
@@ -19,6 +20,7 @@ RSpec.describe MemDB::Index::SequenceMatch do
     query: {path: "abc"},
     expect: []
   }
+
   it_behaves_like "index", "contains substring", {
     indexing: [
       [{path: "abc"}, :abc]
@@ -26,6 +28,7 @@ RSpec.describe MemDB::Index::SequenceMatch do
     query: {path: "0abc0"},
     expect: [:abc]
   }
+
   it_behaves_like "index", "sequence does not match", {
     indexing: [
       [{path: "abcd"}, :abcd]
@@ -33,6 +36,44 @@ RSpec.describe MemDB::Index::SequenceMatch do
     query: {path: "abcz"},
     expect: []
   }
+
+  context "when text case mismatch" do
+    it_behaves_like "index", "exact match", {
+      indexing: [
+        [{path: "aBC"}, :abc]
+      ],
+      query: {path: "ABc"},
+      expect: []
+    }
+
+    it_behaves_like "index", "contains substring", {
+      indexing: [
+        [{path: "aBC"}, :abc]
+      ],
+      query: {path: "0ABc0"},
+      expect: []
+    }
+
+    context "when downcase decorator applied" do
+      let(:index) { described_class.new(idx: MemDB::Idx::Bytes.new(:path).downcase) }
+
+      it_behaves_like "index", "exact match", {
+        indexing: [
+          [{path: "aBC"}, :abc]
+        ],
+        query: {path: "ABc"},
+        expect: [:abc]
+      }
+
+      it_behaves_like "index", "contains substring", {
+        indexing: [
+          [{path: "aBC"}, :abc]
+        ],
+        query: {path: "0ABc0"},
+        expect: [:abc]
+      }
+    end
+  end
 
   describe described_class::Bucket do
     let(:index) do

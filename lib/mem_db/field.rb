@@ -10,6 +10,10 @@ class MemDB
       MemDB::Field::Negative.new(self)
     end
 
+    def downcase
+      MemDB::Field::Downcase.new(self)
+    end
+
     def field
       raise NotImplementedError, "#{self.class} has not implemented method '#{__method__}'"
     end
@@ -23,11 +27,15 @@ class MemDB
       @query_field || field
     end
 
-    def new_matching(_obj)
+    def new_matching(_value)
       raise NotImplementedError, "#{self.class} has not implemented method '#{__method__}'"
     end
 
-    def query_value(query)
+    def field_value(obj)
+      obj[field]
+    end
+
+    def prepare_query(query)
       query[query_field]
     end
   end

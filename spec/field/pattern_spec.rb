@@ -136,4 +136,214 @@ RSpec.describe MemDB::Field::Pattern do
     query: {text: "-101abc9"},
     expect: true
   }
+
+  context "when text mismatch" do
+    it_behaves_like "field", "exact single match", {
+      matching: {text: "foOD"},
+      query: {text: "FOod"},
+      expect: false
+    }
+
+    it_behaves_like "field", "exact single match to multiquery", {
+      matching: {text: "foOD"},
+      query: {text: ["games", "FOod"]},
+      expect: false
+    }
+
+    it_behaves_like "field", "multiple match", {
+      matching: {text: ["foOD", "clothes"]},
+      query: {text: "FOod"},
+      expect: false
+    }
+
+    it_behaves_like "field", "multiple match to multiquery", {
+      matching: {text: ["foOD", "clothes"]},
+      query: {text: ["games", "FOod"]},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by prefix", {
+      matching: {text: "aBC*"},
+      query: {text: "ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by prefix", {
+      matching: {text: "aBC*"},
+      query: {text: "ABc9"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by suffix", {
+      matching: {text: "*aBC"},
+      query: {text: "0ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by suffix", {
+      matching: {text: "*aBC"},
+      query: {text: "ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by sequence", {
+      matching: {text: "*aBC*"},
+      query: {text: "ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by sequence", {
+      matching: {text: "*aBC*"},
+      query: {text: "0ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by sequence", {
+      matching: {text: "*aBC*"},
+      query: {text: "ABc9"},
+      expect: false
+    }
+
+    it_behaves_like "field", "match by sequence", {
+      matching: {text: "*aBC*"},
+      query: {text: "0ABc9"},
+      expect: false
+    }
+
+    it_behaves_like "field", "pattern match", {
+      matching: {text: "0*aBC"},
+      query: {text: "0ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "pattern match 2", {
+      matching: {text: "0*aBC"},
+      query: {text: "01234ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "pattern match 3", {
+      matching: {text: "*0*aBC"},
+      query: {text: "0ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "pattern match 4", {
+      matching: {text: "*0*aBC"},
+      query: {text: "-101ABc"},
+      expect: false
+    }
+
+    it_behaves_like "field", "pattern match 6", {
+      matching: {text: "*0*aBC*"},
+      query: {text: "-101ABc9"},
+      expect: false
+    }
+
+    context "when downcase decorator applied" do
+      let(:field) { described_class.new(:text).downcase }
+
+      it_behaves_like "field", "exact single match", {
+        matching: {text: "foOD"},
+        query: {text: "FOod"},
+        expect: true
+      }
+
+      it_behaves_like "field", "exact single match to multiquery", {
+        matching: {text: "foOD"},
+        query: {text: ["games", "FOod"]},
+        expect: true
+      }
+
+      it_behaves_like "field", "multiple match", {
+        matching: {text: ["foOD", "clothes"]},
+        query: {text: "FOod"},
+        expect: true
+      }
+
+      it_behaves_like "field", "multiple match to multiquery", {
+        matching: {text: ["foOD", "clothes"]},
+        query: {text: ["games", "FOod"]},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by prefix", {
+        matching: {text: "aBC*"},
+        query: {text: "ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by prefix", {
+        matching: {text: "aBC*"},
+        query: {text: "ABc9"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by suffix", {
+        matching: {text: "*aBC"},
+        query: {text: "0ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by suffix", {
+        matching: {text: "*aBC"},
+        query: {text: "ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by sequence", {
+        matching: {text: "*aBC*"},
+        query: {text: "ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by sequence", {
+        matching: {text: "*aBC*"},
+        query: {text: "0ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by sequence", {
+        matching: {text: "*aBC*"},
+        query: {text: "ABc9"},
+        expect: true
+      }
+
+      it_behaves_like "field", "match by sequence", {
+        matching: {text: "*aBC*"},
+        query: {text: "0ABc9"},
+        expect: true
+      }
+
+      it_behaves_like "field", "pattern match", {
+        matching: {text: "0*aBC"},
+        query: {text: "0ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "pattern match 2", {
+        matching: {text: "0*aBC"},
+        query: {text: "01234ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "pattern match 3", {
+        matching: {text: "*0*aBC"},
+        query: {text: "0ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "pattern match 4", {
+        matching: {text: "*0*aBC"},
+        query: {text: "-101ABc"},
+        expect: true
+      }
+
+      it_behaves_like "field", "pattern match 6", {
+        matching: {text: "*0*aBC*"},
+        query: {text: "-101ABc9"},
+        expect: true
+      }
+    end
+  end
 end

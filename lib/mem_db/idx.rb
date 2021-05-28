@@ -12,6 +12,10 @@ class MemDB
       default(MemDB::Idx::ANY)
     end
 
+    def downcase
+      MemDB::Idx::Downcase.new(self)
+    end
+
     def field
       raise NotImplementedError, "#{self.class} has not implemented method '#{__method__}'"
     end

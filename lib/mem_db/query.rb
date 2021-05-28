@@ -6,6 +6,7 @@ class MemDB
       @params = params
       @attrs = {}
       @idx_value = {}
+      @field_value = {}
     end
 
     def using(index)
@@ -34,6 +35,14 @@ class MemDB
         @idx_value[idx]
       else
         @idx_value[idx] ||= idx.prepare_query(self)
+      end
+    end
+
+    def field_value(field)
+      if @field_value.key?(field)
+        @field_value[field]
+      else
+        @field_value[field] ||= field.prepare_query(self)
       end
     end
 
