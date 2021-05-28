@@ -4,13 +4,17 @@ class MemDB
   class Fields
     class Matching
       def initialize(fields, obj)
-        @matchings = fields.map { |field| field.new_matching(obj) }.reject! do |matching|
-          matching == MemDB::Field::MayMissing::ANY_MATCHING
-        end
+        @matchings = fields
+          .map do |field|
+            [field, field.new_matching(field.field_value(obj))]
+          end
+          .reject! do |_field, matching|
+            matching == MemDB::Field::MayMissing::ANY_MATCHING
+          end
       end
 
       def match?(query)
-        @matchings.all? { |matching| matching.match?(query) }
+        @matchings.all? { |field, matching| matching.match?(query.field_value(field)) }
       end
     end
 

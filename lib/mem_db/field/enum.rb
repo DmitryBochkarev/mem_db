@@ -11,28 +11,24 @@ class MemDB
       class MultiMatching
         include MemDB::Field::Matching
 
-        def initialize(enum, arr)
-          @enum = enum
+        def initialize(arr)
           @arr = arr
         end
 
-        def match?(query)
-          @enum.query_value(query).any? do |el|
-            @arr.include?(el)
-          end
+        def match?(values)
+          values.any? { |el| @arr.include?(el) }
         end
       end
 
       class SingleMatching
         include MemDB::Field::Matching
 
-        def initialize(enum, el)
-          @enum = enum
+        def initialize(el)
           @el = el
         end
 
-        def match?(query)
-          @enum.query_value(query).include?(@el)
+        def match?(values)
+          values.include?(@el)
         end
       end
 
@@ -42,13 +38,11 @@ class MemDB
         @field = field
       end
 
-      def new_matching(obj)
-        val = obj[field]
-
-        if val.is_a?(Array)
-          MultiMatching.new(self, val)
+      def new_matching(value)
+        if value.is_a?(Array)
+          MultiMatching.new(value)
         else
-          SingleMatching.new(self, val)
+          SingleMatching.new(value)
         end
       end
     end

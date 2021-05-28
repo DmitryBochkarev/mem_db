@@ -1,5 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.5
+  NewCops: enable
 
 Style/StringLiterals:
   Enabled: true
@@ -40,4 +41,10 @@ Metrics/BlockLength:
   Enabled: false
 
 Metrics/MethodLength:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Style/MultilineBlockChain:
   Enabled: false
