@@ -2,6 +2,10 @@
 
 Embedded database with support of composite indices and complex document matching.
 
+## ARCHIVED
+
+Main repostory https://github.com/wallarm/mem_db
+
 ## Installation
 
 Add this line to your application's Gemfile:
